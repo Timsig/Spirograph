@@ -10,22 +10,21 @@ window.onload = function() {
 		},
 
 		rad1 = 300,
-		rad2 = 100,
-		rad3 = 100,
-		innerRad = rad1 - rad2,
-		circ1 = 2 * Math.PI * rad1,
-		circ2 = 2 * Math.PI * rad2,
-		revs = circ1 / circ2,
+		rad2 = 105,
+		rad3 = 105, //Assume penpoint is on circumference of smaller circle
+		innerRad = rad1 - rad2, //Radius of inner circle (described by centrepoint of small wheel)
+		revs = rad1 / rad2, //Number of times path touches outer radius
 		angle1 = - Math.PI / 2,
 		angle2 = angle1,
-		angleQT = (Math.PI / revs) / 2,
+		angleToPoint = (Math.PI / revs), //Angle to next point and outer handle angle
 		innerAngleDiff = 0,
-		controlDist = rad3 * 1.125,
+		controlDist = rad3 * 1.125, //Distance of control point from handle
 		penPoints = [],
+		
 		//*************temp***************
 		innerPoints = [];
 
-		console.log(angleQT);
+		
 
 		
 
@@ -34,34 +33,47 @@ window.onload = function() {
 	context.moveTo(centre.x, centre.y);
 	drawPoint(centre);
 
-	createPoints(angle1, angle2);
+	createPoints(angle1, angleToPoint);
 	
 
 	//Create penpoints and push to array
 	function createPoints(_angle1, _angle2) {
-		var innerP = makePoint(centre, innerRad, _angle1);
+		var outerPoint = makePoint(centre, rad1, _angle1);
 		var penP = {};
-		penP.point = makePoint(innerP, rad3, _angle2);
-		penP.cp1 = makePoint(penP.point, controlDist, _angle2 - Math.PI / 2);
-		penP.cp2 = makePoint(penP.point, controlDist, _angle2 + Math.PI / 2);
+		penP.point = outerPoint;
+		penP.cp1 = makePoint(penP.point, controlDist, _angle1 - Math.PI); //+ angleToPoint / revs);
+		penP.cp2 = makePoint(penP.point, controlDist, _angle1 - Math.PI); // - angleToPoint / revs);
 		
 		if (penPoints[0] && penPoints[0].point.x === penP.point.x && penPoints[0].point.y === penP.point.y) {
 			return;
 		}
-		innerPoints.push(innerP);
 		penPoints.push(penP);
-		penPoints.length > 0 ? innerAngleDiff += Math.PI / 2 : innerAngleDiff = 0;
-		createPoints(_angle1 + angleQT, _angle1 + angleQT - innerAngleDiff);	
+		var innerPoint = makePoint(centre, rad1 - rad2 * 2, _angle1 + _angle2);
+		var penP2 = {};
+		penP2.point = innerPoint;
+		penP2.cp1 = makePoint(penP2.point, controlDist / revs, _angle1 + _angle2 - Math.PI / 2);
+		penP2.cp2 = makePoint(penP2.point, controlDist / revs, _angle1 + _angle2 + Math.PI / 2);
+		penPoints.push(penP2);
+		createPoints(_angle1 + _angle2 * 2, _angle2);
+
 	}
+	context.strokeStyle = 'tomato';
+	drawCircle(centre, rad1);
+
 	console.log(penPoints);
-	innerPoints.forEach(function(item) {
-	drawPoint(item);
-	});
-	context.fillStyle = 'tomato';
 	penPoints.forEach(function(item) {
-	drawPoint2(item.point);
+	drawPoint(item.point);
+	drawPoint2(item.cp1);
+	drawPoint2(item.cp2);
 	});
 
+
+	// context.fillStyle = 'tomato';
+	// penPoints.forEach(function(item) {
+	// drawPoint2(item.point);
+	// });
+
+// Draw the path
 	context.moveTo(penPoints[0].point.x, penPoints[0].point.y);
 	for (var i = 0; i < penPoints.length; i += 1) {
 		var b = i + 1 === penPoints.length ? 0 : i + 1;
@@ -94,15 +106,11 @@ window.onload = function() {
 		
 	}
 
-	// **********************************draw the graph
-	// context.moveTo(outerPoints[0].x, outerPoints[0].y);
-
-	// for (var i = 0; i < outerPoints.length; i += 1){
-	// 	var b = i + 1 >= outerPoints.length ? 0 : i + 1;
-	// 	context.bezierCurveTo(outerPoints[i].c2.x, outerPoints[i].c2.y, innerPoints[i].c1.x, innerPoints[i].c1.y, innerPoints[i].x, innerPoints[i].y);
-	// 	context.bezierCurveTo(innerPoints[i].c2.x, innerPoints[i].c2.y, outerPoints[b].c1.x, outerPoints[b].c1.y, outerPoints[b].x, outerPoints[b].y);
-	// }
-	// context.stroke();
-	
+	function drawCircle (p, rad) {
+		context.beginPath();
+		context.arc(p.x, p.y, rad, 0, Math.PI * 2, false);
+		context.stroke();
+		
+	}
 	
 };
