@@ -1,0 +1,40 @@
+Let's create some input variables:innerRadius = 200 (You could have a user input this value)
+outerRadius = 100 (You could have a user input this value)
+ratio = 10 (You could have a user input this value)
+resolution = 10000 (You probably want this to be very high)
+ 
+This is the amount we move around the circle in each loop iteration:
+minAngle = 2*PI / resolution
+ 
+Now we need a temporary variable for the current angle:
+On each iteration
+innerAngle = i * minAngle;
+ 
+The outer angle is determined by the inner angle and the ratio:
+outerAngle = innerAngle * ratio
+ 
+We know that in a circle, the X position is given by the cosine of the angle and the Y position is given by the sine of the angle.
+X = cos(angle) * radius
+Y = sin(angle) * radius
+ 
+Where to draw
+The answer to where the "pencil" is in each iteration is given by the X and Y of the inner circle, plus the offsets given by the outer circle
+innerX = cos(innerAngle) * innerRadius
+innerY = sin(innerAngle) * innerRadius
+ 
+outerX = cos(outerAngle) * outerRadius
+outerY = sin(outerAngle) * outerRadius
+ 
+globalX = innerX + outerX
+globalY = innerY + outerY
+ 
+Offsets
+Now there's one last thing to do: Our circle is centered on the top left corner of the screen. To fix this will add half the canvas width and half the canvas height to the results:
+ 
+realX = globalX + (0.5* canvas.width)
+realY = globalY + (0.5* canvas.width)
+ 
+Now draw a line to (canvas lineTo() method) realX and to realY
+ 
+Extra detail:
+If you use lineTo inside the loop without setting the position first you'll start off with a line from the top left corner of the page to the first point in the spirograph. To prevent this, outside the loop calculate the X and Y for the first point in the spirgraph (inner angle 0, outer angle 0) and use moveTo() to start the cursor there.

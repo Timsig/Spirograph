@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+</html>
+    <head>
+        <title>Canvas spirograph</title>
+    </head>
+    <body>
+        <div>
+            <canvas id="test" width="600" height="600"></canvas>
+            <script>
+                var c = document.getElementById("test");
+                var ctx = c.getContext("2d");
+                var innerRadius = 200;
+                var outerRadius = 100;
+                var ratio = 10;
+                var resolution = 10000;
+                var minAngle = 2*Math.PI / resolution;
+                var innerAngle, outerAngle;
+                var realX, realY;
+                ctx.strokeStyle = "black";
+                ctx.beginPath();
+                for(i = 0; i < resolution; i++) {
+                    innerAngle = i * minAngle;
+                    outerAngle = innerAngle * ratio
+                    innerX = Math.cos(innerAngle) * innerRadius
+                    innerY = Math.sin(innerAngle) * innerRadius
+                    outerX = Math.cos(outerAngle) * outerRadius
+                    outerY = Math.sin(outerAngle) * outerRadius
+                    globalX = innerX + outerX
+                    globalY = innerY + outerY
+                    realX = Math.floor(globalX + (0.5* c.width));
+                    realY = Math.floor(globalY + (0.5* c.width));
+                    ctx.lineTo(realX, realY);
+                }
+                ctx.stroke();
+                ctx.closePath();
+            </script>
+        </div>
+    </body>
+</html>
